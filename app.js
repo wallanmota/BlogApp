@@ -3,7 +3,7 @@
     const handlebars = require('express-handlebars');
     const bodyParser = require('body-parser');
     const path = require('path')
-    // const mongoose = require('mongoose');
+    const mongoose = require('mongoose');
 
     const app = express()
     const admin = require('./routes/admin');
@@ -16,7 +16,14 @@
         app.engine('handlebars', handlebars({defaultLayout: 'main'}));
         app.set('view engine', 'handlebars')
     //Mongoose
-        //Soon
+        mongoose.Promise = global.Promise;
+        mongoose.connect('mongodb+srv://user-01:jhDdMqBfZzNhrmWx@cluster0.g2ws4.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',{
+            useNewUrlParser: true
+        }).then(()=>{
+            console.log('Conectado ao mongoDB com sucesso')
+        }).catch((err)=>{
+            console.log('Erro ao se conectar com o mongoDB' + err)
+        });
     //Public
         app.use(express.static(path.join(__dirname, 'public')))
 
