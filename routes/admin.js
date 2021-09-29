@@ -15,7 +15,13 @@ router.get('/posts', (req, res)=>{
 });
 
 router.get('/categorias', (req,res)=>{
-    res.render('admin/categorias')
+    Categoria.find().lean().sort({updatedAt: 'desc'}).then((categorias) => { //listar as categorias do banco
+        res.render('admin/categorias', {categorias: categorias}) //passando as categorias para a página
+    }).catch((err)=>{
+        req.flash('error_msg', 'Houve um erro ao listar as categorias!')
+        res.redirect('/admin')
+    });
+    
 })
 router.get('/categorias/add', (req,res)=>{
     res.render('admin/addcategorias')
@@ -43,7 +49,7 @@ router.post('/categorias/nova', (req,res)=>{
         }
     
         new Categoria(novaCategoria).save().then(()=>{
-            req.flash('success_msg', 'Categoria criada com sucesso!')
+            req.flash('success_msg', 'Categoria criada/editada com sucesso!')
             res.redirect('/admin/categorias')
             console.log('Categoria adicionada com sucesso!');
         }).catch((err)=>{
@@ -54,4 +60,35 @@ router.post('/categorias/nova', (req,res)=>{
     };
     
 });
+
+router.get('/categorias/edit/:id', (req,res)=>{
+    Categoria.findOne({_id:req.params.id}).lean().then((categoria) =>{
+        res.render('admin/editcategorias', {categoria: categoria})
+    }).catch((err)=>{
+        req.flash('error_msg', 'Esta categoria não existe')
+        res.redirect('/admin/categorias')
+    })
+    
+});
+
+router.post('/categorias/edit',(req,res)=>{
+    
+    Categoria.findOne({_id: req.body.id}).then((categoria)=>{
+        categoria.nome = req.body.nome
+        categoria.slug = req.body.slug
+
+        categoria.save().then(()=>{
+            req.flash('success_msg', 'Categoria editada com sucesso!')
+            res.redirect('/admin/categorias')
+        }).catch((err)=>{
+            req.flash('error_msg', 'Houve um erro ao editar categoria')
+            res.redirect('/admin/categorias')
+        })
+
+    }).catch((err)=>{
+        req.flash('error_msg', 'Houve um erro ao editar a categoria!')
+        res.redirect('/admin/categorias')
+    })
+});
+
 module.exports = router;
