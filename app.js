@@ -45,8 +45,8 @@
         app.use(express.static(path.join(__dirname, 'public')))
 //Rotas
 
-router.get('/', (req,res)=>{
-    res.render('public/index');
+app.get('/', (req,res)=>{
+    res.render('layouts/index');
 });
     app.use('/admin', admin);
 //Outros
