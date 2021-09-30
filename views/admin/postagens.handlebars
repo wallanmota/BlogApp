@@ -8,8 +8,9 @@
             <h4>{{titulo}}</h4>
             <p>Descrição: {{descricao}}</p>
             <small>Categoria: {{categorias.nome}}</small><br>
-            <small>Atualizado em: {{updatedAt}}</small>
+            <small>Atualizado em: {{updatedAt}}</small><br>
             <a href="/admin/postagens/edit/{{_id}}"><button class="btn btn-success">Editar Postagem</button></a> 
+            <a href="/admin/postagens/deletar/{{_id}}"><button class="btn btn-danger">Deletar Postagem</button></a> 
         </div>
     </div>
 {{else}}

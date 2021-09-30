@@ -9,10 +9,10 @@
             <small>Slug: {{slug}}</small><br>
             <small>Data de criação: {{createdAt}}</small><br>
             <small>Ultima atualização: {{updatedAt}}</small><br>
-            <a href="/admin/categorias/edit/{{_id}}"><button class="btn btn-success mt-2 mb-2">Editar</button></a>
-            <form action="/admin/categorias/deletar" method="POST">
+            <a href="/admin/categorias/edit/{{_id}}"><button class="btn btn-success mt-2 mb-2">Editar Categoria</button></a>
+            <form style="display: inline;" action="/admin/categorias/deletar" method="POST">
                 <input type="hidden" name="id" value="{{_id}}">
-                <button type="submit" class="btn btn-danger">Deletar</button>
+                <button type="submit" class="btn btn-danger">Deletar Categoria</button>
             </form>
         </div>
     </div>

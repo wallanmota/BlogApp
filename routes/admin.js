@@ -195,6 +195,16 @@ const mongoose = require('mongoose'); //Importa mongoose
                 res.redirect('/admin/postagens')
             })
         });
+
+    //DELETAR POSTAGENS
+        router.get('/postagens/deletar/:id',(req,res)=>{ //Forma não recomendada (rota get)
+            Postagem.remove({_id: req.params.id}).then(()=>{
+                res.redirect('/admin/postagens')
+            }).catch((err)=>{
+                req.flash('error_msg', 'Houve um erro ao deletar postagem, tente novamente!')
+                res.redirect('/admin/postagens')
+            })
+        });
 // ## FIM POSTAGENS ##
 
  module.exports = router;
