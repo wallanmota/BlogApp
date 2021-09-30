@@ -18,7 +18,7 @@ const mongoose = require('mongoose'); //Importa mongoose
 
 
 // ## CATEGORIAS ##
-    //LISTAR CATEGORIAS
+    //ROTA CATEGORIAS / LISTAR
         router.get('/categorias', (req,res)=>{
             Categoria.find().lean().sort({updatedAt: 'desc'}).then((categorias) => { //listar as categorias do banco
                 res.render('admin/categorias', {categorias: categorias}) //passando as categorias para a página
@@ -111,10 +111,18 @@ const mongoose = require('mongoose'); //Importa mongoose
 //## FIM CATEGORIAS ##
 
 //## POSTAGENS ##
-    //ROTA  POSTAGENS
+    //ROTA  POSTAGENS / LISTAR
         router.get('/postagens', (req,res)=>{
-            res.render('admin/postagens')
+            //populate recupera valores da collection categorias
+            Postagem.find().lean().populate('categorias').sort({updatedAt: 'desc'}).then((postagens)=>{
+                res.render('admin/postagens', {postagens: postagens})
+            }).catch((err)=>{
+                req.flash('error_msg', 'Houve um erro ao registrar postagem!')
+                res.render('admin/postagens')
+            })
+            
         });
+
     //CARREGAR FORMULARIO POSTAGENS
         router.get('/postagens/add', (req, res)=>{
             Categoria.find().lean().then((categorias)=>{
@@ -149,6 +157,43 @@ const mongoose = require('mongoose'); //Importa mongoose
                     res.redirect('/admin/postagens')
                 })
             }
+        });
+    //EDITAR POSTAGENS
+        router.get('/postagens/edit/:id', (req,res)=>{
+            Postagem.findOne({_id:req.params.id}).lean().then((postagens) =>{ //Busca em sequencia 
+                Categoria.find().lean().then((categorias)=>{
+                    res.render('admin/editpostagens', {postagens: postagens, categorias: categorias})
+                }).catch(()=>{
+                    req.flash('error_msg', 'Houve um erro ao listar as categorias!')
+                    res.redirect('/admin/postagens')
+                })
+            }).catch((err)=>{
+                req.flash('error_msg', 'Houve um erro ao carregar formulário de edição')
+                res.redirect('/admin/postagens')
+            })
+
+        });
+        router.post('/postagens/edit',(req,res)=>{
+            
+            Postagem.findOne({_id: req.body.id}).then((postagens)=>{
+                postagens.titulo= req.body.titulo
+                postagens.slug= req.body.slug
+                postagens.descricao= req.body.descricao
+                postagens.conteudo= req.body.conteudo
+                postagens.categorias = req.body.categorias
+
+                postagens.save().then(()=>{
+                    req.flash('success_msg', 'Postagem editada com sucesso!')
+                    res.redirect('/admin/postagens')
+                }).catch((err)=>{
+                    req.flash('error_msg', 'Houve um erro ao editar postagem')
+                    res.redirect('/admin/postagens')
+                })
+
+            }).catch((err)=>{
+                req.flash('error_msg', 'Houve um erro ao editar a postagens!')
+                res.redirect('/admin/postagens')
+            })
         });
 // ## FIM POSTAGENS ##
 
