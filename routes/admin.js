@@ -1,18 +1,21 @@
 const express = require('express');
 const router = express.Router();
 
-//Model externo mongoose
-    const mongoose = require('mongoose'); //Importa mongoose
-    require('../models/Categoria'); //Chama arquivo do model
-    const Categoria = mongoose.model('categorias'); //chama func q vai passar ref do model para uma variavel
+const mongoose = require('mongoose'); //Importa mongoose
 
-router.get('/', (req,res)=>{
-    res.render('admin/index');
-});
+//MODEL EXTERNO MONGOOSE
+    //CATEGORIAS
+        require('../models/Categoria'); //Chama arquivo do model
+        const Categoria = mongoose.model('categorias'); //chama func q vai passar ref do model para uma variavel
+    //POSTAGENS
+        require('../models/Postagem');
+        const Postagem = mongoose.model('postagens')
 
-router.get('/posts', (req, res)=>{
-    res.send('Pagina de postagem')
-});
+//ROTA INDEX ADM
+    router.get('/', (req,res)=>{
+        res.render('admin/index');
+    });
+
 
 // ## CATEGORIAS ##
     //LISTAR CATEGORIAS
@@ -33,7 +36,7 @@ router.get('/posts', (req, res)=>{
 
         router.post('/categorias/nova', (req,res)=>{
 
-            //Validação manual
+            //VALIDACAO MANUAL
             var erros = []; //Validacao alternativa if(!req.body.nome || !req.body.slug){code...}
             if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
                 erros.push({texto: 'Nome inválido!'})
@@ -108,11 +111,11 @@ router.get('/posts', (req, res)=>{
 //## FIM CATEGORIAS ##
 
 //## POSTAGENS ##
-    //LISTAR POSTAGENS
+    //ROTA  POSTAGENS
         router.get('/postagens', (req,res)=>{
             res.render('admin/postagens')
         });
-    //ADICIONAR POSTAGENS
+    //CARREGAR FORMULARIO POSTAGENS
         router.get('/postagens/add', (req, res)=>{
             Categoria.find().lean().then((categorias)=>{
                 res.render('admin/addpostagens', {categorias: categorias})
@@ -120,6 +123,32 @@ router.get('/posts', (req, res)=>{
                 req.flash('error_msg', 'Houve um erro ao carregar o formulário')
                 res.redirect('/admin')
             })
+        });
+    //ADICIONAR POSTAGENS
+        router.post('/postagens/nova',(req, res)=>{
+
+            var erros = []
+            if(req.body.categoria = 0){
+                erros.push({texto: 'Categoria inválida, registre uma categoria!'})
+            }
+            if(erros.length > 0){
+                res.render('admin/addpostagens', {erros: erros})
+            }else{
+                const novaPostagem = {
+                    titulo: req.body.titulo,
+                    slug: req.body.slug,
+                    descricao: req.body.descricao,
+                    conteudo: req.body.conteudo,
+                    categorias: req.body.categorias
+                };
+                new Postagem(novaPostagem).save().then(()=>{
+                    req.flash('success_msg', 'Postagem criada com sucesso!')
+                    res.redirect('/admin/postagens')
+                }).catch((err)=>{
+                    req.flash('error_msg', 'Houve um erro ao registrar postagem, tente novamente!')
+                    res.redirect('/admin/postagens')
+                })
+            }
         });
 // ## FIM POSTAGENS ##
 
