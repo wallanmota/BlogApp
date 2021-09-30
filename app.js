@@ -10,7 +10,9 @@
 
     const app = express()
     const admin = require('./routes/admin');
-    // const inicio = require('./views/layouts')
+
+    require('./models/Postagem')
+    const Postagem = mongoose.model('postagens')
 
 //Config
     //Sessão
@@ -43,12 +45,37 @@
         });
     //Public
         app.use(express.static(path.join(__dirname, 'public')))
-//Rotas
 
-app.get('/', (req,res)=>{
-    res.render('layouts/index');
-});
+//Rotas
+    app.get('/', (req,res)=>{
+        Postagem.find().lean().populate('categorias').sort({updatedAt: 'desc'}).then((postagens)=>{
+            res.render('index', {postagens: postagens});
+        }).catch((err)=>{
+            req.flash('error_msg', 'Não foi possivel carregar as postagens')
+            res.redirect('/404')
+        })
+    });
+
+    app.get('/postagem/:slug', (req, res)=>{
+        Postagem.findOne({slug: req.params.slug}).then((postagem)=>{
+            if(postagem){
+                res.render('postagem/index', {postagem:postagem})
+            }else{
+                req.flash('error_msg', 'Esta postagem não existe')
+                res.redirect('/')
+            }
+        }).catch((err)=>{
+            req.flash('error_msg', 'Houve um erro interno')
+            res.redirect('/')
+        })
+    })
+
+    app.get('/404',(req, res)=>{
+        res.send('ERRO 404')
+    })
+
     app.use('/admin', admin);
+
 //Outros
     const PORT = 5000
     app.listen(PORT, ()=>{

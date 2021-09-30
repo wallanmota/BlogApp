@@ -1,0 +1,32 @@
+<!-- Jumbotron -->
+<div class="p-4 shadow-4 rounded-3" style="background-color: hsl(0, 0%, 94%);">
+  <h2>Bem vindo ao Blog App</h2>
+  <p class="lead">
+    This is a simple hero unit, a simple jumbotron-style component for calling extra
+    attention to featured content or information.
+  </p>
+  <hr class="my-4" />
+  <p>
+    It uses utility classes for typography and spacing to space content out within the
+    larger container.
+  </p>
+  <button type="button" class="btn btn-primary">Crie uma conta</button>
+</div>
+<!-- Jumbotron -->
+<hr>
+<h2>Postagens recentes</h2>
+{{#each postagens}}
+    <div class="card mt-4">
+        <div class="card-body">
+            <h4>{{titulo}}</h4>
+            <p>Descrição: {{descricao}}</p>
+            <a href="/postagem/{{slug}}"><button class="btn btn-success">Leia mais!</button></a>
+            <hr>
+            <small>Categoria: {{categorias.nome}}</small><br>
+            <small>Atualizado em: {{updatedAt}}</small>
+
+        </div>
+    </div>
+{{else}}
+    <h4 class="mt-4">Nenhuma postagem registrada!</h4>
+{{/each}}
