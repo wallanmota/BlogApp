@@ -10,6 +10,7 @@
 
     const app = express()
     const admin = require('./routes/admin');
+    const usuarios = require('./routes/usuario')
 
     require('./models/Postagem')
     const Postagem = mongoose.model('postagens')
@@ -106,6 +107,7 @@
     })
 
     app.use('/admin', admin);
+    app.use('/usuarios', usuarios)
 
 //Outros
     const PORT = 5000
