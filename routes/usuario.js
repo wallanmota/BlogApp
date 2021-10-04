@@ -3,7 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 require('../models/Usuario');
 const Usuario = mongoose.model('usuarios');
-const bcrypt = require('bcryptjs') //Criptografia hash
+const bcrypt = require('bcryptjs'); //Criptografia hash
+const passport = require('passport'); //Autenticação 
 
 router.get('/registro', (req,res)=>{
     res.render('usuarios/registro')
@@ -61,5 +62,15 @@ router.post('/registro', (req, res)=>{ //tem o mesmo nome mas é do tipo POST
 
 router.get('/login',(req, res)=>{
     res.render('usuarios/login')
+})
+
+//Rota e processo de autenticação
+router.post('/login', (req, res, next)=>{
+    //authenticate = funcao para autenticar + local(q foi o tipo de autenticacao escolhida nesse projeto)
+    passport.authenticate('local',{
+        successRedirect: '/',
+        failureRedirect: '/usuarios/login',
+        failureFlash: true
+    })(req, res, next)
 })
 module.exports = router;
