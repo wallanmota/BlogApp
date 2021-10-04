@@ -7,16 +7,20 @@
     const session = require('express-session');
     const flash = require('connect-flash'); //Flash é um tipo de sessao q soh carrega uma vez
     const router = express.Router();
+    const passport = require('passport');
 
     const app = express()
     const admin = require('./routes/admin');
-    const usuarios = require('./routes/usuario')
+    const usuarios = require('./routes/usuario');
+
 
     require('./models/Postagem')
     const Postagem = mongoose.model('postagens')
 
     require('./models/Categoria')
     const Categoria = mongoose.model('categorias')
+
+    require('./config/auth')(passport)
 
 //Config
     //Sessão
@@ -25,6 +29,10 @@
             receive: true,
             saveUninitialized: true
         }));
+
+        app.use(passport.initialize());
+        app.use(passport.session());
+
         app.use(flash()) //Flash tem que ficar abaixo da sessao
     //Middleware
         app.use((req, res, next)=>{
