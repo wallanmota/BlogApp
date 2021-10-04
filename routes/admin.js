@@ -3,6 +3,11 @@ const router = express.Router();
 
 const mongoose = require('mongoose'); //Importa mongoose
 
+//Chama o helper eAdmin 
+//Para proteger a rota basta inserir a constante eAdmin logo apos a chamada da rota antes do (req,res)
+const {eAdmin} = require('../helpers/eAdmin')
+
+
 //MODEL EXTERNO MONGOOSE
     //CATEGORIAS
         require('../models/Categoria'); //Chama arquivo do model
@@ -12,14 +17,14 @@ const mongoose = require('mongoose'); //Importa mongoose
         const Postagem = mongoose.model('postagens')
 
 //ROTA INDEX ADM
-    router.get('/', (req,res)=>{
+    router.get('/', eAdmin, (req,res)=>{
         res.render('admin/index');
     });
 
 
 // ## CATEGORIAS ##
     //ROTA CATEGORIAS / LISTAR
-        router.get('/categorias', (req,res)=>{
+        router.get('/categorias', eAdmin, (req,res)=>{
             Categoria.find().lean().sort({updatedAt: 'desc'}).then((categorias) => { //listar as categorias do banco
                 res.render('admin/categorias', {categorias: categorias}) //passando as categorias para a página
             }).catch((err)=>{
@@ -30,11 +35,11 @@ const mongoose = require('mongoose'); //Importa mongoose
         });
 
     //ADICIONAR CATEGORIA
-        router.get('/categorias/add', (req,res)=>{
+        router.get('/categorias/add', eAdmin, (req,res)=>{
             res.render('admin/addcategorias')
         })
 
-        router.post('/categorias/nova', (req,res)=>{
+        router.post('/categorias/nova', eAdmin, (req,res)=>{
 
             //VALIDACAO MANUAL
             var erros = []; //Validacao alternativa if(!req.body.nome || !req.body.slug){code...}
@@ -69,7 +74,7 @@ const mongoose = require('mongoose'); //Importa mongoose
         });
 
     //EDITAR CATEGORIA
-        router.get('/categorias/edit/:id', (req,res)=>{
+        router.get('/categorias/edit/:id', eAdmin, (req,res)=>{
             Categoria.findOne({_id:req.params.id}).lean().then((categoria) =>{
                 res.render('admin/editcategorias', {categoria: categoria})
             }).catch((err)=>{
@@ -78,7 +83,7 @@ const mongoose = require('mongoose'); //Importa mongoose
             })
 
         });
-        router.post('/categorias/edit',(req,res)=>{
+        router.post('/categorias/edit', eAdmin,(req,res)=>{
 
             Categoria.findOne({_id: req.body.id}).then((categoria)=>{
                 categoria.nome = req.body.nome
@@ -99,7 +104,7 @@ const mongoose = require('mongoose'); //Importa mongoose
         });
 
     //DELETAR CATEGORIA
-        router.post('/categorias/deletar', (req,res)=>{
+        router.post('/categorias/deletar', eAdmin, (req,res)=>{
             Categoria.remove({_id: req.body.id}).lean().then(()=>{
                 req.flash('success_msg', 'Categoria removida com sucesso!')
                 res.redirect('/admin/categorias')
@@ -112,7 +117,7 @@ const mongoose = require('mongoose'); //Importa mongoose
 
 //## POSTAGENS ##
     //ROTA  POSTAGENS / LISTAR
-        router.get('/postagens', (req,res)=>{
+        router.get('/postagens', eAdmin, (req,res)=>{
             //populate recupera valores da collection categorias
             Postagem.find().lean().populate('categorias').sort({updatedAt: 'desc'}).then((postagens)=>{
                 res.render('admin/postagens', {postagens: postagens})
@@ -124,7 +129,7 @@ const mongoose = require('mongoose'); //Importa mongoose
         });
 
     //CARREGAR FORMULARIO POSTAGENS
-        router.get('/postagens/add', (req, res)=>{
+        router.get('/postagens/add', eAdmin, (req, res)=>{
             Categoria.find().lean().then((categorias)=>{
                 res.render('admin/addpostagens', {categorias: categorias})
             }).catch((err)=>{
@@ -133,7 +138,7 @@ const mongoose = require('mongoose'); //Importa mongoose
             })
         });
     //ADICIONAR POSTAGENS
-        router.post('/postagens/nova',(req, res)=>{
+        router.post('/postagens/nova', eAdmin,(req, res)=>{
 
             var erros = []
             if(req.body.categoria = 0){
@@ -159,7 +164,7 @@ const mongoose = require('mongoose'); //Importa mongoose
             }
         });
     //EDITAR POSTAGENS
-        router.get('/postagens/edit/:id', (req,res)=>{
+        router.get('/postagens/edit/:id', eAdmin, (req,res)=>{
             Postagem.findOne({_id:req.params.id}).lean().then((postagens) =>{ //Busca em sequencia 
                 Categoria.find().lean().then((categorias)=>{
                     res.render('admin/editpostagens', {postagens: postagens, categorias: categorias})
@@ -173,7 +178,7 @@ const mongoose = require('mongoose'); //Importa mongoose
             })
 
         });
-        router.post('/postagens/edit',(req,res)=>{
+        router.post('/postagens/edit', eAdmin,(req,res)=>{
             
             Postagem.findOne({_id: req.body.id}).then((postagens)=>{
                 postagens.titulo= req.body.titulo
@@ -197,7 +202,7 @@ const mongoose = require('mongoose'); //Importa mongoose
         });
 
     //DELETAR POSTAGENS
-        router.get('/postagens/deletar/:id',(req,res)=>{ //Forma não recomendada (rota get)
+        router.get('/postagens/deletar/:id', eAdmin, (req,res)=>{ //Forma não recomendada (rota get)
             Postagem.remove({_id: req.params.id}).then(()=>{
                 req.flash('success_msg', 'Postagem deletada com sucesso!')
                 res.redirect('/admin/postagens')

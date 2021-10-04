@@ -39,6 +39,8 @@
             res.locals.success_msg = req.flash('success_msg') //Variavel Global
             res.locals.error_msg = req.flash('error_msg') //Variavel Global
             res.locals.error = req.flash('error')
+            //req.user = o passport cria para armazenar dados do usuario logado
+            res.locals.user = req.user || null;
             next()
         })
     //Body Parser
