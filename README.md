@@ -4,7 +4,7 @@ Neste projeto foi desenvolvido a estrutura de um blog com área administrativa p
 
 Foi feito controle de acesso as rotas administrativas com passport.
 
-Projeto criado com objetivo de estudar NodeJS, Express e MongoDB
+Projeto criado com objetivo de estudar NodeJS, Express e MongoDB 
 
 ##
 
